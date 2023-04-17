@@ -1,0 +1,56 @@
+{
+  "user": [
+    {
+      "username": "admin",
+      "name": "Bochra",
+      "password": "admin",
+      "id": "BochraBochra@gmail.com",
+      "phone": "8989898989",
+      "country": "usa",
+      "address": "",
+      "role": "admin",
+      "gender": "female"
+    },
+    {
+      "username": "user1",
+      "name": "user1",
+      "password": "useruser",
+      "id": "email@email.com",
+      "phone": "9632511111",
+      "country": "singapore",
+      "address": "addressaddrees2521",
+      "role": "user",
+      "gender": "male"
+    }
+  ],
+  "roleaccess": [
+    {
+      "role": "admin",
+      "menu": "customer",
+      "haveadd": true,
+      "haveedit": true,
+      "havedelete": true
+    },
+    {
+      "role": "admin",
+      "menu": "supplier",
+      "haveadd": true,
+      "haveedit": true,
+      "havedelete": true
+    },
+    {
+      "role": "user",
+      "menu": "customer",
+      "haveadd": false,
+      "haveedit": false,
+      "havedelete": false
+    },
+    {
+      "role": "user1",
+      "menu": "customer",
+      "haveadd": false,
+      "haveedit": false,
+      "havedelete": false
+    }
+  ]
+}

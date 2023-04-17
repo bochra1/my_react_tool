@@ -1,25 +1,33 @@
 import logo from './logo.svg';
 import './App.css';
+import Sidenav from "./Sidenav";
+import Login from './Login';
+import Register from './Register';
+import Home from './Home';
+import AppHeader from './AppHeader';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import AdminDashboard from './AdminDashboard';
 
 function App() {
-  return (
+  return(
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <ToastContainer theme='colored' position='top-center'></ToastContainer>
+      <BrowserRouter>
+      <AppHeader></AppHeader>
+      <Routes>
+      <Route path='/' element={<Home/>}></Route>
+        <Route path='/login' element={<Login/>}></Route>
+        <Route path='/register' element={<Register/>}></Route>
+        <Route path='/AdminDashboard' element={<AdminDashboard/>}></Route>
+
+      </Routes>
+      
+      </BrowserRouter>
+      
     </div>
   );
+  
 }
 
 export default App;
