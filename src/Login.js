@@ -67,12 +67,12 @@ return (
 
                         <div className="card-body">
                             <div className="form-group">
-                                <label style={{color:'red'}}>Email: <span className="errmsg">*</span></label>
+                                <label style={{color:'black'}}>Email: <span className="errmsg">*</span></label>
                                 <input value={email} onChange={e => usernameupdate(e.target.value)} className="form-control"></input>
                             </div>
 
                             <div className="form-group">
-                                <label style={{color:'red'}}>Password: <span className="errmsg">*</span></label>
+                                <label style={{color:'black'}}>Password: <span className="errmsg">*</span></label>
                                 <input type="password" value={password} onChange={e => userpasswordupdate(e.target.value)} className="form-control"></input>
                             </div>
                         </div>
