@@ -19,20 +19,28 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import CreateIcon from '@mui/icons-material/Create';
+import DraftsIcon from '@mui/icons-material/Drafts';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import AdminDashboard from './AdminDashboard';
+import Home from './Home';
+import CreateScript from "./CreateScript";
 const drawerWidth = 240;
 const menuItems = [
-    { text: 'Inbox', link: '/inbox' },
-    { text: 'Run Script', link: '/home' },
-    { text: 'Create Script', link: '/CreateScript' },
-    { text: 'Drafts', link: '/drafts' },
-    { text: 'Logout', link: '/login' }
+    { text: 'AdminDashboard', link: '/admindashboard', icon: <DashboardIcon />  },
+    { text: 'Run Script', link: '/home', icon: <PlayArrowIcon /> },
+    { text: 'Create Script', link: '/CreateScript',icon: <CreateIcon /> },
+    { text: 'Drafts', link: '/drafts',icon: <DraftsIcon />  },
+    { text: 'Logout', link: '/login',icon: <ExitToAppIcon />  }
 
   ];
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
   ({ theme, open }) => ({
     flexGrow: 1,
     padding: theme.spacing(3),
-    transition: theme.transitions.create('margin', {
+    transition: theme.transitions.create('margin', { 
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
@@ -86,6 +94,8 @@ const AppHeader = () => {
   
     const [displayusername, displayusernameupdate] = useState('');
     const [showmenu, showmenuupdateupdate] = useState(false);
+    const [userrole, setrole] = useState("");
+    const [pathname, setpathname] = useState("");
 
     const usenavigate = useNavigate();
     const location = useLocation();
@@ -97,10 +107,14 @@ const AppHeader = () => {
         else {
             showmenuupdateupdate(true);
             let username = sessionStorage.getItem('username');
+            let userrole = sessionStorage.getItem('userrole');
+            let pathname = location.pathname;;
             if (username === '' || username === null) {
                 usenavigate('/login');
             } else {
                 displayusernameupdate(username);
+                setrole(userrole)
+                setpathname(pathname)
             }
         }
         
@@ -150,9 +164,9 @@ LineData Reporting          </Typography>
         {menuItems.map((item) => (
           <ListItem key={item.text} disablePadding>
             <ListItemButton component="a" href={item.link}>
-              <ListItemIcon >
-                {menuItems.indexOf(item) % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
+              <ListItemIcon style={{ color: 'red' }}>
+                  {item.icon}      
+        </ListItemIcon>
               <ListItemText primary={item.text} style={{ color: 'red' }} />
             </ListItemButton>
           </ListItem>
@@ -164,7 +178,12 @@ LineData Reporting          </Typography>
       </Drawer>
       <Main open={open}>
         <DrawerHeader />
+        {userrole == 'admin'&& pathname=='/admindashboard' && <AdminDashboard/>}
+        {userrole == 'user' || userrole=='admin' &&pathname=='/home' && <Home/>}
+        {userrole == 'user'|| userrole=='admin'&& pathname=='/CreateScript' && <CreateScript/>}
+
         <Typography paragraph>
+          
         </Typography>
       
       </Main>
