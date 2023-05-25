@@ -90,7 +90,7 @@ app.put("/api/update/:id", (req, res) => {
 
 
 // Chemin vers le répertoire contenant les fichiers de test
-const testDirectory = 'C:/Users/bochra/OneDrive/Bureau/tests';
+const testDirectory = 'C:/Users/BLabbenne/source/repos/inputs';
 
 app.get('/tests', (req, res) => {
   // Lister tous les fichiers dans le répertoire de test
@@ -128,7 +128,6 @@ app.get('/json-data', (req, res) => {
     }
   });
 });
-
 
 
 app.get('/iframe', (req, res) => {

@@ -3,51 +3,63 @@ import ReportInput from './ReportInput'
 import Register from './Register'
 import axios from 'axios';
 import Cookies from 'js-cookie';
-
+import { Link, useLocation, useNavigate } from "react-router-dom";
 function CreateScript() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [cook, setcook] = useState('');
+  const [isHomePageLoaded, setIsHomePageLoaded] = useState(false);
+  const [externalWindow, setExternalWindow] = useState(null);
+  const [isok, setresponse] = useState("");
 
   const apiUrl = process.env.LDR_APP_URL;
   const iframeRef = useRef(null);
-  const srcifr = 'https://bs1rpt05.ad.linedata.com/UMBReportingAdminPortal/Account/LogOn';
+  const srcifr = 'http://localhost:3001/eexternal-website';
   const cookieValue = Cookies.get('ASP.NET_SessionId');
-  const handleLogin = () => {
-    setcook(cookieValue);
 
-    console.log(cook);
-    // Access the input elements in the iframe document using their id attribute
-    /*if(iframeRef){
-    const usernameInput = iframeRef.current.contentDocument.getElementById('UserName');
-    const passwordInput = iframeRef.current.contentDocument.getElementById('Password');
+  const OpenLDR = async () => {
+    axios({
+      url: 'https://localhost:7214/tests/createScript',
+      method: 'GET',
+    
+    })
+      .then(response => {
+       
+        setresponse(JSON.stringify (response.data));
+      console.log(response.data)})
 
-    // Get the values of the input elements
-    const usernameValue = usernameInput.value;
-    const passwordValue = passwordInput.value;
-
-    // Do something with the input values
-    console.log('Username:', usernameValue);
-    console.log('Password:', passwordValue);
-  }else {console.log("no iframe")}*/};
-
+      .catch(error => {
+        console.error('There was a problem with the Axios request:', error);
+      });
+  };
+ 
+ 
   return (
+    
     <div>
-      <iframe
-        src={srcifr}
+    {/*<ReportInput/>*/}
+     <iframe
+      id="external-website-iframe"
+      src={srcifr}
+      seamless 
         ref={iframeRef}
         width="100%"
         height="500"
         title="Example website"
-        sandbox="allow-scripts allow-same-origin allow-forms  allow-top-navigation-by-user-activation"
-        allow="fullscreen encrypted-media *"
-        csp
-      ></iframe>
-
-      <button onClick={handleLogin}>Login</button>
+        sandbox="  allow-scripts allow-same-origin allow-forms  allow-top-navigation-by-user-activation "
+        allow="fullscreen  "
+       // onLoad={handleLogin}
+             ></iframe>
+  {isok ? (
+            <p>Test Created succ</p>
+          ) : (
+            <p>Loading data...</p>
+          )}
+  <button on onClick={OpenLDR}>Login</button>
     </div>
   );
 }
+
 
 export default CreateScript

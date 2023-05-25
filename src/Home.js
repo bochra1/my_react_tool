@@ -10,6 +10,9 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
+import ExtentReportComponent from "./ExtentReportComponent";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+
 export default function Home() {
   const [result, setResult] = useState("");
   const [testresult, settestResult] = useState("");
@@ -19,9 +22,15 @@ export default function Home() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [open, setOpen] = useState(false);
   const [fileContent, setFileContent] = useState('');
+  const [isok, setresponse] = useState("");
+  const [displayresult, setdisplayresult] = useState(false);
+  const [openresult, setOpenresult] = useState(false);
+  const [resultContent, setresultContent] = useState('');
+  const [playSound, setPlaySound] = React.useState(false);
 
-
-
+const OpenExtentReport =()=>{
+<ExtentReportComponent/>
+}
   const handleFileInputChange = (event) => {
     setSelectedFile(event.target.files[0]);
   };
@@ -70,6 +79,9 @@ const extractFileName = (file) => {
 const handleCloseDialog = () => {
   setOpen(false);
 };
+const handleCloseDialogResult = () => {
+  setOpenresult(false);
+};
 
   const handleOpenHtmlFile = async () => {
     try {
@@ -80,7 +92,7 @@ const handleCloseDialog = () => {
       console.log(error.response.data); // error message from the API
     }
   };
-  const handleRunTests = async () => {
+  /*const handleRunTests = async () => {
     setIsLoading(true);
 
     const headers= {
@@ -96,8 +108,48 @@ const handleCloseDialog = () => {
       setIsLoading(false)
       handleTestResult();
 
-  };
+  };*/
+  const handleRunTests = async (filePath) => {
+    setIsLoading(true);
 
+    axios.post('https://localhost:7214/tests/runScript', null, {
+      params: {
+        param: filePath
+      }
+    })
+      .then(response => {
+        // Handle the response from the server
+       setresultContent(response.data);
+       setOpenresult(true);
+        console.log('Server response:', response.data);
+        const outputResult = response.data;
+        setdisplayresult(true);
+        setPlaySound(true);
+
+
+      })
+      .catch(error => {
+        console.error('Request error:', error);
+      });  
+      setIsLoading(false);
+
+
+  };
+  const OpenLDR = async () => {
+    axios({
+      url: 'https://localhost:7214/tests/createScript',
+      method: 'GET',
+    
+    })
+      .then(response => {
+       
+        setresponse(JSON.stringify (response.data));
+      console.log(response.data)})
+
+      .catch(error => {
+        console.error('There was a problem with the Axios request:', error);
+      });
+  };
   const handleTestResult = async () => { await
     axios
       .get("https://localhost:7214/tests/testresult")
@@ -109,7 +161,7 @@ const handleCloseDialog = () => {
 
   const columns = [
     { field: "id", headerName: "ID", width: 70 },
-    { field: "Scripts", headerName: "Scripts", width: 300 },
+    { field: "Scripts", headerName: "Scripts", width: 350 },
     { field: "Report_File_path", headerName: "Report File Path", width: 300 },
     {
       field: "Result_File_path",
@@ -124,13 +176,16 @@ const handleCloseDialog = () => {
       renderCell: (params) => {
         const fileName = params.row.Scripts;
         const handleButtonClick = () => {
-          const filePath = `C:/Users/bochra/OneDrive/Bureau/tests/${fileName}`;
-          console.log(`Path of file '${fileName}': ${filePath}`);
-          // You can perform further actions with the file path herecd server
-        };
-        return (
+          const filePath = `C:/Users/BLabbenne/source/repos/inputs/${fileName}`;
+          //console.log(`Path of file '${fileName}': ${filePath}`);
+          handleRunTests(`${filePath}`);
+       
+
+          };
+        return (      
           <Button variant="outlined" color="primary" onClick={handleButtonClick}>
 Run          </Button>
+            
         );
       },
     },
@@ -140,7 +195,7 @@ Run          </Button>
       width: 150,
       renderCell: (params) => {
         const fileName = params.row.Scripts;
-        const filePath = `C:/Users/bochra/OneDrive/Bureau/tests/${fileName}.json`;
+        const filePath = `C:/Users/BLabbenne/source/repos/inputs/${fileName}.json`;
         setfilepath(filePath);
         const fetchFileContent =async () => {
           try {
@@ -180,22 +235,17 @@ Description          </Button>
           }}
         >
        
+        <Button   variant="contained"
+        color="primary" onClick={OpenLDR}>create Script</Button>
+{displayresult &&
+          <Link to ='/ExtentReportComponent'>
           <Button
             variant="contained"
             color="primary"
-            onClick={handleRunTests}
-            style={{ marginRight: "10px" }}
-          >
-            Run
-          </Button>     
-
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleOpenHtmlFile}
+            //onClick={OpenExtentReport}
           >
             View Result
-          </Button>
+          </Button></Link>}
          <input
   type="file"
   id="file-input"
@@ -231,6 +281,21 @@ Description          </Button>
         >
           <pre>{testresult.output}</pre>
         </Box>}
+        {openresult && <div><Dialog open={openresult} onClose={handleCloseDialogResult} maxWidth="md">
+        <DialogTitle>File Content</DialogTitle>
+        <DialogContent>
+          <pre>{resultContent}</pre>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialogResult} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog></div> }
+
+
+
+
         {open && <div><Dialog open={open} onClose={handleCloseDialog} maxWidth="md">
       <DialogTitle>File Content</DialogTitle>
       <DialogContent>

@@ -1,32 +1,43 @@
 import { useState, useEffect } from 'react';
+import axios from "axios";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 function ExtentReportComponent() {
-  const [reportPath, setReportPath] = useState('');
+  const [extentReport, setExtentReport] = useState(false);
 
   useEffect(() => {
-    async function fetchReportPath() {
-      try {
-        const response = await fetch('https://localhost:7214/tests/GetExtentReport');
-        const path = await response.text();
-        setReportPath(path);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    fetchReportPath();
+    axios({
+      url: 'https://localhost:7214/tests/GetExtentReport',
+      method: 'GET',
+      responseType: 'blob',
+    })
+      .then(response => {
+        const fileUrl = URL.createObjectURL(response.data);
+        setExtentReport(true);
+        const iframe = document.createElement('iframe');
+        iframe.src = fileUrl;
+        iframe.width = '100%';
+        iframe.height = '100%';
+        iframe.style.position = 'fixed';
+        iframe.style.top = '0';
+        iframe.style.left = '0';
+        iframe.style.bottom = '0';
+        iframe.style.right = '0';
+        document.body.appendChild(iframe);
+      })
+      .catch(error => {
+        console.error('There was a problem with the Axios request:', error);
+      });
   }, []);
 
   return (
     <div>
-      {reportPath && (
-        <iframe
-          src={reportPath}
-          title="Test report"
-          style={{ width: '100%', height: '100vh', border: 'none' }}
-        />
-      )}
-    </div> 
+    <Link to ='/'>
+    <button>Back</button></Link>
+     {extentReport ? <p>Loading extent report...</p> : null}
+     
+    </div>
   );
 }
+
 export default ExtentReportComponent;

@@ -179,8 +179,8 @@ LineData Reporting          </Typography>
       <Main open={open}>
         <DrawerHeader />
         {userrole == 'admin'&& pathname=='/admindashboard' && <AdminDashboard/>}
-        {userrole == 'user' || userrole=='admin' &&pathname=='/home' && <Home/>}
-        {userrole == 'user'|| userrole=='admin'&& pathname=='/CreateScript' && <CreateScript/>}
+        {(userrole == 'user' || userrole=='admin' )&&pathname=='/home' && <Home/>}
+        {(userrole == 'user'|| userrole=='admin')&& pathname=='/CreateScript' && <CreateScript/>}
 
         <Typography paragraph>
           

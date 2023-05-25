@@ -33,7 +33,7 @@ function App() {
         <Route path='/UserDeleteModal' element={<UserDeleteModal/>}></Route>
 
         <Route path='/RunScheduleScript' element={<RunScheduleScript/>}></Route>
-        
+
         <Route path='/ScheduleExecution' element={<ScheduleExecution/>}></Route>
         <Route path='/EditModal' element={<EditModal/>}></Route>
 
