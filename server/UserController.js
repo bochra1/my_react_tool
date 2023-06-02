@@ -109,6 +109,22 @@ app.get('/tests', (req, res) => {
   });
 });
 
+// Endpoint pour supprimer un fichier
+app.delete('/api/delete/:fileName', (req, res) => {
+  const fileName = req.params.fileName;
+  const filePath = `C:/Users/BLabbenne/source/repos/inputs/${fileName}.json`;
+
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Une erreur s\'est produite lors de la suppression du fichier' });
+    } else {
+      res.sendStatus(200); // Réponse OK si le fichier est supprimé avec succès
+    }
+  });
+});
+
+
 app.get('/json-data', (req, res) => {
   const filePath = req.query.filePath;
 

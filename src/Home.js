@@ -10,15 +10,17 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
-import ExtentReportComponent from "./ExtentReportComponent";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { Link } from "react-router-dom";
+import { BsPencilSquare, BsTrash,BsPlusCircle  } from 'react-icons/bs';
+import Checkbox from '@mui/material/Checkbox';
 
 export default function Home() {
   const [result, setResult] = useState("");
   const [testresult, settestResult] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [testFiles, setTestFiles] = useState([]);
-  const [filepath, setfilepath] = useState("");
+  const [filepath, setfilepath] = useState([]);
   const [selectedFile, setSelectedFile] = useState(null);
   const [open, setOpen] = useState(false);
   const [fileContent, setFileContent] = useState('');
@@ -26,11 +28,17 @@ export default function Home() {
   const [displayresult, setdisplayresult] = useState(false);
   const [openresult, setOpenresult] = useState(false);
   const [resultContent, setresultContent] = useState('');
-  const [playSound, setPlaySound] = React.useState(false);
-
-const OpenExtentReport =()=>{
-<ExtentReportComponent/>
-}
+  const [selectedRows, setSelectedRows] = useState([]);
+  
+  const handleRowSelection = (params) => {
+    const selectedRow = `C:/Users/BLabbenne/source/repos/inputs/${params.row.Scripts}`;
+    
+    setSelectedRows((prevSelectedRows) => [...prevSelectedRows, selectedRow]);
+  };
+  /*useEffect(() => {
+    console.log(selectedRows);
+  }, [selectedRows]);*/
+    
   const handleFileInputChange = (event) => {
     setSelectedFile(event.target.files[0]);
   };
@@ -76,6 +84,22 @@ const extractFileName = (file) => {
   const extractedName = dotIndex !== -1 ? file.substring(0, dotIndex) : file;
   return extractedName;
 };
+
+const deleteFile = (fileName) => {
+  axios.delete(`http://localhost:3002/api/delete/${fileName}`)
+    .then(response => {
+      if (response.status === 200) {
+        console.log('File deleted');
+        // Add logic here to update the file list in your interface
+      } else {
+        console.error('Error deleting file');
+      }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+};
+
 const handleCloseDialog = () => {
   setOpen(false);
 };
@@ -83,32 +107,29 @@ const handleCloseDialogResult = () => {
   setOpenresult(false);
 };
 
-  const handleOpenHtmlFile = async () => {
-    try {
-      const fileName = 'Program.html';
-      const response = await axios.get(`https://localhost:7214/api/OpenHtmlFile`);
-      console.log(response.data); // success message from the API
-    } catch (error) {
-      console.log(error.response.data); // error message from the API
-    }
-  };
-  /*const handleRunTests = async () => {
-    setIsLoading(true);
-
-    const headers= {
+const handleRunAllTests = async () => {
+  setIsLoading(true);
+  const config = {
+    headers: {
       'Content-Type': 'application/json'
     }
-  await  axios
-      .get("https://localhost:7214/tests/run",{headers})
-      .then( (response)=>  setResult(response.data),
-      console.log("setasfalse?")
+  };
+  const requestBody = selectedRows; // Assuming `selectedRows` is already an array of strings
+  axios
+    .post('https://localhost:7214/tests/runAllScripts', requestBody, config)
+    .then(response => {
+      setresultContent(response.data);
+      setOpenresult(true);
+      console.log('Server response:', response.data);
+      setdisplayresult(true);
+      setIsLoading(false);
+    })
+    .catch(error => {      setIsLoading(false);
+     toast.error('An error occurred during the request. Please try again.');
+      console.error('Request error:', error);
+    });
+};
 
-      )
-      .catch(function(error){  console.log(error)});
-      setIsLoading(false)
-      handleTestResult();
-
-  };*/
   const handleRunTests = async (filePath) => {
     setIsLoading(true);
 
@@ -124,14 +145,17 @@ const handleCloseDialogResult = () => {
         console.log('Server response:', response.data);
         const outputResult = response.data;
         setdisplayresult(true);
-        setPlaySound(true);
+        setIsLoading(false);
 
 
       })
       .catch(error => {
         console.error('Request error:', error);
+
+        toast.error('An error occurred during the request. Please try again.');
+        setIsLoading(false);
+
       });  
-      setIsLoading(false);
 
 
   };
@@ -144,22 +168,28 @@ const handleCloseDialogResult = () => {
       .then(response => {
        
         setresponse(JSON.stringify (response.data));
-      console.log(response.data)})
+        console.log(response.data)})
 
       .catch(error => {
         console.error('There was a problem with the Axios request:', error);
       });
   };
-  const handleTestResult = async () => { await
-    axios
-      .get("https://localhost:7214/tests/testresult")
-      .then((response) =>
-      settestResult(response.data))
-      .catch((error) => console.error(error),  
-      );
-  };
-
+  
   const columns = [
+    {
+      field: 'check',
+      headerName: '',
+      width: 70,
+      renderCell: (params) => {
+        const fileName = params.row.Scripts;
+        const filePath = `C:/Users/BLabbenne/source/repos/inputs/${fileName}`;
+      
+        return (
+          <Checkbox
+            onChange={() => handleRowSelection(params)}
+          />
+        );
+      }},
     { field: "id", headerName: "ID", width: 70 },
     { field: "Scripts", headerName: "Scripts", width: 350 },
     { field: "Report_File_path", headerName: "Report File Path", width: 300 },
@@ -184,8 +214,8 @@ const handleCloseDialogResult = () => {
           };
         return (      
           <Button variant="outlined" color="primary" onClick={handleButtonClick}>
-Run          </Button>
-            
+            Run  </Button>
+           
         );
       },
     },
@@ -218,12 +248,29 @@ Run          </Button>
 Description          </Button>
         );
       },
+    },
+    {
+      field: 'delete',
+      headerName: '',
+      width: 150,
+      renderCell: (params) => {
+        const fileName = params.row.Scripts;
+        const handleDeleteClick = () => {
+          //console.log(`Path of file '${fileName}': ${filePath}`);
+          deleteFile(`${fileName}`)       
+
+          };
+        return (      
+          <button className="btn btn-link" title="Delete" onClick={handleDeleteClick}>
+          <BsTrash />
+        </button>
+           
+        );
+      },
     }
 
   ];
 
-  
-  
   return (
     <div style={{ display: "flex", justifyContent: "center" }}>
       <div style={{ height: 400, width: "100%" }}>
@@ -268,8 +315,11 @@ Description          </Button>
         columns={columns}
         pageSize={5}
         rowsPerPageOptions={[5]}
-        checkboxSelection
+      // checkboxSelection
+      
       />
+      <Button   variant="contained"
+      color="primary" onClick={handleRunAllTests}>Run </Button>
         {isLoading && <Loading/>}
        {testresult&&  <Box
           sx={{
@@ -292,10 +342,6 @@ Description          </Button>
           </Button>
         </DialogActions>
       </Dialog></div> }
-
-
-
-
         {open && <div><Dialog open={open} onClose={handleCloseDialog} maxWidth="md">
       <DialogTitle>File Content</DialogTitle>
       <DialogContent>

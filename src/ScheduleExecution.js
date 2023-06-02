@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 const ScheduleExecution = () => {
-  const [selectedDateTime, setSelectedDateTime] = useState("");
+  /*const [selectedDateTime, setSelectedDateTime] = useState("");
   const [isScheduled, setIsScheduled] = useState(false);
 
   const handleDateTimeChange = (event) => {
@@ -37,7 +37,7 @@ const ScheduleExecution = () => {
         {isScheduled ? "Scheduled" : "Schedule Execution"}
       </button>
     </div>
-  );
+  );*/
 };
 
 export default ScheduleExecution;
