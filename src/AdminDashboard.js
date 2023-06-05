@@ -5,8 +5,17 @@ import Register from './Register';
 import EditModal from './EditModal';
 import axios from 'axios';
 import { toast } from "react-toastify";
+import AddUserModal from './AddUserModal';
 function AdminDashboard() {
-  const [idtoremove, setidtoremove] = useState([]);
+  const [showregisterModal, setShowregisterModal] = useState(false);
+
+  const handleCloseregisterModal = () => {
+    setShowregisterModal(false);
+  };
+
+  const handleOpenregisterModal = () => {
+    setShowregisterModal(true);
+  };  
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [userToEdit, setUserToEdit] = useState(null);
@@ -14,10 +23,13 @@ function AdminDashboard() {
   const [show, setShow] = useState(false);
   const [users, setUsers] = useState([]);
   const confirm = window.confirm;
+  const jwttoken = sessionStorage.getItem('jwttoken');
+
+  axios.defaults.headers.common['Authorization'] = `Bearer ${jwttoken}`;
 
   useEffect(()=>{
 
-    axios.get('http://localhost:3002/api/users')
+    axios.get('https://localhost:7072/api/users')
   .then(response => {        setUsers(response.data);
 
     console.log(response);
@@ -26,14 +38,9 @@ function AdminDashboard() {
     console.log(error);
   });
 
-  },[])
+  })
  
-  {/*useEffect(() => {
-    fetch('http://localhost:8000/user')
-      .then(response => response.json())
-      .then(data => setData(data))
-      .catch(error => console.log(error));
-  }, []);*/}
+   
   const handleEdit = (id) => {
     // Find the user with the matching ID in the data array
     const userToEdit = {...users.find(user => user.id === id)};
@@ -64,15 +71,12 @@ function AdminDashboard() {
   };
   const handleRemove = (id) => {
 
-
     if (confirm('Are you sure you want to delete this user?')) {
      // Filter out the user with the matching ID from the data array
   const updatedData = users.filter(user => user.id !== id);
 
   // Send a DELETE request to the API to remove the user 
-  fetch(`http://localhost:3002/api/users/${id}`, {
-    method: 'DELETE',
-  })
+  axios.delete(`https://localhost:7072/api/users/${id}`)   
     .then(response => {
       if (!response.ok) {
         throw new Error('Network response was not ok');
@@ -106,11 +110,10 @@ function AdminDashboard() {
         </div>
       </div>
       <div className="col-md-6 mb-3">
-   <Link to='/register'>
-      <button>
+      <button onClick={handleOpenregisterModal}>
       <BsPlusCircle size={20} />
       Add
-    </button></Link></div>
+    </button></div>
       <table className="table">   
         <thead>
           <tr>
@@ -131,9 +134,9 @@ function AdminDashboard() {
               <td>{user.username}</td>
               <td>{user.name}</td>
               <td>{user.email}</td>
-              <td>{user.role}</td>
-              <td>{user.gender}</td>
               <td>{user.phonenumber}</td>
+              <td>{user.gender}</td>
+              <td>{user.role}</td>
               <td>
                 <button className='btn btn-link'>    
                   <BsPencilSquare   title="Edit" onClick={() => handleEdit(user.id)} />
@@ -147,8 +150,9 @@ function AdminDashboard() {
         </tbody>
       </table>
        {/* Modal */}
-       {showModal && <EditModal user={userToEdit} handleClose={handleModalClose} handleEdit={handleSave} show={edit
-       } />
+       <AddUserModal show={showregisterModal} handleClose={handleCloseregisterModal} />
+
+       {showModal && <EditModal user={userToEdit} handleClose={handleModalClose} handleEdit={handleSave} show={edit} />
      
 }
     

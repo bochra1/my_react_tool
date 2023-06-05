@@ -2,9 +2,12 @@ import { useState,useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import logo from './images/logo.svg'
+import axios, { Axios } from "axios";
 const Login = () =>{
     const [email,usernameupdate]= useState('');
     const [password,userpasswordupdate]= useState('');
+ const [token,settoken]= useState('');
+
     const usenavigate = useNavigate();
     useEffect(()=>{
         sessionStorage.clear();
@@ -18,28 +21,41 @@ const ProceedLogin = (e)=>{
     if (password === '' || password === null) {
         toast.warning('Please Enter Password');
     }
-    else  fetch("http://localhost:8000/user/" + email).then((res) => {
-        return res.json();
-    }).then((resp) => {
-        //console.log(resp)
-        if (Object.keys(resp).length === 0) {
-            toast.error('Please Enter valid username');
-        } else {
-            if (resp.password === password) {
-                toast.success('Success');
-                sessionStorage.setItem('username',resp.username);
-                sessionStorage.setItem('userrole',resp.role);
-                if (resp.role === "admin") {
-                    usenavigate("/admindashboard");
-                  } else {
-                    usenavigate("/");
-                  }  }else{
-                toast.error('Please Enter valid credentials');
+   
+
+
+
+
+    else   axios.post('https://localhost:7072/api/users/login', { email, password })
+    .then(response => {
+        if (response.status === 200) {
+            toast.success('Login successful');
+            settoken(response.data.token);
+            sessionStorage.setItem('jwttoken', response.data.token);
+
+            sessionStorage.setItem('username', response.data.username);
+            sessionStorage.setItem('userrole', response.data.role);
+            if (response.data.role === "admin") {
+              usenavigate("/admindashboard");
+            } else {
+              usenavigate("/");
             }
-        }
-    }).catch((err) => {
-        toast.error('Login Failed due to :' + err.message);
-    });
+          } 
+          
+    })
+    .catch(error => {
+        if (error.response && error.response.status === 401) {
+            toast.error('password');
+          } else if (error.response && error.response.status === 404) {
+            toast.error('Email does not exist');
+          } else {
+            toast.error('An error occurred. Please try again.');
+          }    });
+    
+    
+    
+    
+
 }
 const validate = () => {
     let result = true;
