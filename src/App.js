@@ -9,7 +9,6 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import AdminDashboard from './AdminDashboard';
 import CreateScript from './CreateScript';
-import ScheduleExecution from './ScheduleExecution';
 import ExtentReportComponent from './ExtentReportComponent';
 import EditModal from './EditModal';
 import RunScheduleScript from './RunScheduleScript';
@@ -34,7 +33,6 @@ function App() {
 
         <Route path='/RunScheduleScript' element={<RunScheduleScript/>}></Route>
 
-        <Route path='/ScheduleExecution' element={<ScheduleExecution/>}></Route>
         <Route path='/EditModal' element={<EditModal/>}></Route>
 
       </Routes>

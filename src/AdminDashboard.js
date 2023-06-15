@@ -29,17 +29,25 @@ function AdminDashboard() {
 
   useEffect(()=>{
 
-    axios.get('https://localhost:7072/api/users')
+    axios.get('https://localhost:7214/api/User')
   .then(response => {        setUsers(response.data);
 
     console.log(response);
   })
   .catch(error => {
-    console.log(error);
+    console.log();
   });
 
-  })
- 
+  },[])
+  const fetchUsers = () => {
+    axios.get('https://localhost:7214/api/User')
+      .then(response => {
+        setUsers(response.data);
+        //console.log(response);
+      })
+      .catch(error => { console.log(error);
+      });
+  };
    
   const handleEdit = (id) => {
     // Find the user with the matching ID in the data array
@@ -76,7 +84,7 @@ function AdminDashboard() {
   const updatedData = users.filter(user => user.id !== id);
 
   // Send a DELETE request to the API to remove the user 
-  axios.delete(`https://localhost:7072/api/users/${id}`)   
+  axios.delete(`https://localhost:7214/api/User/${id}`)   
     .then(response => {
       if (!response.ok) {
         throw new Error('Network response was not ok');

@@ -26,7 +26,7 @@ const ProceedLogin = (e)=>{
 
 
 
-    else   axios.post('https://localhost:7072/api/users/login', { email, password })
+    else   axios.post('https://localhost:7214/api/User/login', { email, password })
     .then(response => {
         if (response.status === 200) {
             toast.success('Login successful');

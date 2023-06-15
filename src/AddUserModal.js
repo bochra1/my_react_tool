@@ -13,17 +13,22 @@ const AddUserModal = ({ show, handleClose } ) => {
     role: "",
     gender: "",
     phonenumber: "",
+
   });
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
   };
 
+  const jwttoken = sessionStorage.getItem('jwttoken');
+
+  axios.defaults.headers.common['Authorization'] = `Bearer ${jwttoken}`;
   const submitForm = (event) => {
     event.preventDefault();
     axios
-      .post("https://localhost:7072/api/users", {
+      .post("https://localhost:7214/api/User   ", {
         ...formData,
         id_publique: uuidv4(),
       })
@@ -38,13 +43,17 @@ const AddUserModal = ({ show, handleClose } ) => {
           role: "",
           gender: "",
           phonenumber: "",
+
         });
         toast.success("Registered successfully.");
         handleClose(); // Close the modal after successful registration
       })
-      .catch((error) => {
-        console.log(error);
-        toast.error("Failed: " + error.message);
+      .catch((error) => { if (error.response && error.response.status === 409) {
+        setErrorMessage(error.response.data); 
+        toast.error("Failed: " + error.response.data);
+      }
+       else{ console.log(error);
+        toast.error("Failed: " + error);}
       });
   };
 
