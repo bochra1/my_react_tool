@@ -43,7 +43,6 @@ export default function Home() {
   const [activeuser, setactiveuser] = useState('');
   const [isaccepted, setisaccepted] = useState('');
 
-  const fileInputRef = useRef(null);
   
 
  
@@ -207,7 +206,7 @@ const SaveExecution = async (isaccepted )=>{
   const requestBody = {
     username: sessionStorage.getItem('username'),
     reportname: fileName.fileName,
-    Expected: isaccepted
+    Expected: isaccepted,
   };
 
 axios.post('https://localhost:7214/api/Report/addReport', requestBody, config).then(response => 
@@ -291,7 +290,8 @@ const handleRunAllTests = async () => {
         console.error('There was a problem with the Axios request:', error);
       });
   };
-  
+  const fileInputRef = useRef(null);
+
   const columns = [
     {
       field: 'check',
@@ -373,12 +373,16 @@ Description          </Button>
       field: 'SetExpectedFile',
       headerName: '',
       width: 150,
+      
       renderCell: (params) => {
+
         const fileName = params.row.Scripts;
         const filePath = `C:/Users/BLabbenne/source/repos/inputs/${fileName}.json`;
         setfilepath(filePath);
         const handleselectClick =async () => {
-          fileInputRef.current.click();
+         
+            fileInputRef.current.click();
+          
        
         };
         const handleFileInputChange = (event) => {
@@ -387,6 +391,7 @@ Description          </Button>
           handleFileUpload(file);
         };
         return (
+          
           <div>
           <input
           type="file"
@@ -505,6 +510,14 @@ Description          </Button>
         <DialogTitle>File Content</DialogTitle>
         <DialogContent>
           <pre>{resultContent}</pre>
+         {/* <TextField
+          label="Comment"
+          multiline
+          rows={4}
+          variant="outlined"
+          value={comment}
+          onChange={(event) => setComment(event.target.value)}
+        />*/}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialogResult} color="primary">
